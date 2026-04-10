@@ -87,6 +87,10 @@ Every mutation writes to `activity_log`. Every approval decision is logged. Agen
 - Role-based human permission granularity
 - Fine-grained per-action governance gates beyond hire and strategy approval
 
+## Decision Records
+
+- [server-enforced-approvals-and-budget-stops.md](server-enforced-approvals-and-budget-stops.md) — Why approvals, budget hard stops, and their audit trail are enforced in the server rather than delegated to agents or adapters.
+
 ## Open Questions
 
 - What governance-gated actions exist beyond hiring and CEO strategy approval?

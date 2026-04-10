@@ -59,6 +59,10 @@ All sessioned adapters share a common `sessionCodec` pattern that normalizes fie
 - **Skill injection via symlinks** into a temporary `.claude/skills/` directory. This avoids modifying the user's actual project while still making Paperclip skills discoverable by the agent's native skill system.
 - **Billing inference** is adapter-side. Each adapter reports `billingType`, `costUsd`, `provider`, and `biller` from its own output parsing, since different agents surface cost information differently.
 
+## Decision Records
+
+- [shared-server-adapter-contract.md](shared-server-adapter-contract.md) — Why all runtimes plug into one server adapter contract instead of baking provider-specific logic into the control plane.
+
 ---
 
 ## Sub-domains

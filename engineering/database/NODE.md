@@ -74,3 +74,7 @@ For local development and single-user deployments, the DB package supports start
 - **Single database, query-level isolation.** Multi-tenancy is simple and avoids operational complexity of per-tenant databases.
 - **Backup/restore built in.** The DB package includes `pg_dump`/`pg_restore` wrappers for data portability.
 - **No ORM abstraction layer.** Services use Drizzle's query builder directly — no repository pattern wrapping it.
+
+## Decision Records
+
+- [company-scoped-isolation.md](company-scoped-isolation.md) — Why Paperclip keeps multi-company data in one schema while treating `company_id` as a hard isolation boundary across schema, auth, and service logic.

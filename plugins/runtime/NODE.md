@@ -38,6 +38,10 @@ Provide a secure, observable, and resilient execution environment for third-part
 - **Event-driven coordination.** The lifecycle manager emits events (`plugin.loaded`, `plugin.enabled`, etc.) that other services listen to. The job coordinator pauses jobs when a plugin moves out of `ready` state. The tool dispatcher deregisters tools when a plugin is disabled.
 - **Database-backed state.** Plugin state, entities, job runs, and webhook deliveries are persisted in PostgreSQL tables with `pluginId` scoping, not in-memory. This survives server restarts.
 
+## Decision Records
+
+- [worker-isolation-and-capability-gates.md](worker-isolation-and-capability-gates.md) — Why plugin workers are isolated out of process and why the host enforces declared capabilities at install-time and runtime.
+
 ## Boundaries
 
 This domain covers the host-side services that implement the plugin execution contract. The contract itself (types, protocol, SDK API) is defined in `../sdk`. Route handlers that expose plugin management over HTTP live in `../../engineering/backend`. Database schema and migrations live in `../../engineering/database`.

@@ -63,3 +63,7 @@ Config is loaded from environment variables, `.env` files, and a YAML config fil
 - **Drizzle queries live in services, not a separate "repository" layer.** This keeps the codebase flat and avoids over-abstraction.
 - **Agent execution is adapter-driven.** The server never calls LLM APIs directly — it delegates to adapter packages that implement a standard interface.
 - **Secrets are provider-abstracted.** Supports file-based, environment-based, and external secret providers so the same server code works in local dev and cloud deployments.
+
+## Decision Records
+
+- [shared-api-and-actor-scoped-authorization.md](shared-api-and-actor-scoped-authorization.md) — Why board and agent traffic share one API surface, with authorization derived from a common request actor model.

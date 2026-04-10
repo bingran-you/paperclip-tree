@@ -12,6 +12,7 @@
 /adapters/pi-local/                                @cryppadotta @serenakeyitan
 /engineering/                                      @cryppadotta @serenakeyitan
 /engineering/backend/                              @cryppadotta @serenakeyitan
+/engineering/backend/shared-api-and-actor-scoped-authorization.md @cryppadotta @serenakeyitan
 /engineering/cli/                                  @cryppadotta @serenakeyitan
 /engineering/database/                             @cryppadotta @serenakeyitan
 /engineering/database/company-scoped-isolation.md  @cryppadotta @serenakeyitan
@@ -31,6 +32,7 @@
 /plugins/                                          @cryppadotta @serenakeyitan
 /plugins/examples/                                 @cryppadotta @serenakeyitan
 /plugins/runtime/                                  @cryppadotta @serenakeyitan
+/plugins/runtime/worker-isolation-and-capability-gates.md @cryppadotta @serenakeyitan
 /plugins/sdk/                                      @cryppadotta @serenakeyitan
 /product/                                          @cryppadotta @serenakeyitan
 /product/agent-model/                              @cryppadotta @serenakeyitan

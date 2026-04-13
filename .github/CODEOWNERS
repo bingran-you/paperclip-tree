@@ -32,6 +32,7 @@
 /engineering/cli/cli-mirrors-api-and-instance-ops.md @bingran-you @cryppadotta @serenakeyitan
 /engineering/database/                             @bingran-you @cryppadotta @serenakeyitan
 /engineering/database/company-scoped-isolation.md  @bingran-you @cryppadotta @serenakeyitan
+/engineering/execution-workspaces/                 @@bingran-you @@cryppadotta @@serenakeyitan
 /engineering/frontend/                             @bingran-you @cryppadotta @serenakeyitan
 /engineering/frontend/api-layer-and-react-query-over-global-state.md @bingran-you @cryppadotta @serenakeyitan
 /engineering/shared/                               @bingran-you @cryppadotta @serenakeyitan

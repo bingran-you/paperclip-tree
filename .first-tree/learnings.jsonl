@@ -6,3 +6,19 @@
 {"pattern":"duplicate_node_path","pr":270,"fix":"weaker_duplicate","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Weaker decision record than still-open sync for same path"}
 {"pattern":"content_inaccuracy","pr":283,"fix":"missing_runtime_isolation","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Did not capture runtime-state isolation from earlier review"}
 {"pattern":"content_inaccuracy","pr":285,"fix":"webhook_sentry_claim","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Broadened source decision and added Sentry claim not in source PR"}
+{"pattern":"scope_broadening","pr":285,"fix":"scope_to_routine_triggers","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Node framed routine webhook triggers as server-wide webhook integration; github_hmac accepts X-Hub-Signature-256 for both GitHub and Sentry, not separate formats"}
+{"pattern":"invented_concept","pr":267,"fix":"remove_wake_on_unblock","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Sync invented wake-on-unblock opt-in flag; source uses automatic wake-on-all-blockers-done via blockedByIssueIds, cancelled does not count"}
+{"pattern":"missing_supplement","pr":283,"fix":"add_runtime_state_isolation","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Execution workspaces node missed worktree-local node_modules and .paperclip/.env bootstrap from same source range"}
+{"pattern":"partial_enumeration","pr":266,"fix":"full_tool_surface","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"MCP node listed 4 tools plus vague catch-all; source README has 21 read + 12 write + 1 escape hatch tools"}
+{"pattern":"missing_parent_update","pr":266,"fix":"add_to_engineering_node","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"New engineering/mcp-server/ domain not added to engineering/NODE.md sub-domains list"}
+{"pattern":"missing_supplement","pr":264,"fix":"add_reseed_lifecycle_safety","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Contributor guide references execution-workspaces for worktree behavior but source reseed/preflight decisions not captured there"}
+{"pattern":"content_inaccuracy","pr":262,"fix":"correct_retention_presets","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Monthly retention example said 12 months; source presets are 1/3/6. UI only adds retention preset controls, no status dashboard"}
+{"pattern":"weak_node","pr":270,"fix":"strengthen_issue_list_ux","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Issue list node had only generic description; needed concrete decisions (localStorage not URL, blur on Enter, optimistic mutations)"}
+{"pattern":"content_inaccuracy","pr":259,"fix":"correct_blur_and_persistence","date":"2026-04-15T18:30:00Z","reviewer":"githuber","detail":"Node said search does not blur on Enter and filters are URL-driven; source blurs on Enter and uses localStorage"}
+{"pattern":"parent_contradicts_child","pr":267,"fix":"updated_parent","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"content_inaccuracy","pr":262,"fix":"corrected_access_scope","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"overstated_ui_surface","pr":295,"fix":"narrowed_to_shipped_flags","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"parent_subdomain_missing","pr":295,"fix":"added_link_to_parent","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"content_inaccuracy","pr":296,"fix":"rewritten_from_source","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"content_inaccuracy","pr":294,"fix":"added_workspace_command_model","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}
+{"pattern":"overstated_ui_surface","pr":259,"fix":"corrected_button_variants","date":"2026-04-15T20:15:34Z","reviewer":"bingran-you"}

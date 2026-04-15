@@ -1,0 +1,8 @@
+{"pattern":"content_inaccuracy","pr":259,"fix":"rewrote_issue_list_ux","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Node misstated source behavior and had sibling path conflict"}
+{"pattern":"overstated_ui_surface","pr":262,"fix":"narrowed_backup_claims","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Described capabilities source PR does not ship"}
+{"pattern":"content_inaccuracy","pr":264,"fix":"contributor_guide_worktree_ref","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Synced worktree decisions not captured where node points"}
+{"pattern":"parent_subdomain_missing","pr":266,"fix":"added_mcp_to_engineering","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"New domain undiscoverable from engineering map"}
+{"pattern":"content_inaccuracy","pr":267,"fix":"blocker_wake_semantics","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Overstated blocker wake semantics vs source implementation"}
+{"pattern":"duplicate_node_path","pr":270,"fix":"weaker_duplicate","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Weaker decision record than still-open sync for same path"}
+{"pattern":"content_inaccuracy","pr":283,"fix":"missing_runtime_isolation","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Did not capture runtime-state isolation from earlier review"}
+{"pattern":"content_inaccuracy","pr":285,"fix":"webhook_sentry_claim","date":"2026-04-15T17:15:00Z","reviewer":"githuber","detail":"Broadened source decision and added Sentry claim not in source PR"}

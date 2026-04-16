@@ -40,3 +40,7 @@
 {"pattern":"content_inaccuracy","pr":293,"fix":"corrected_recovery_path","date":"2026-04-15T22:00:00Z","reviewer":"bingran-you","detail":"Recovery comments from summarizeRunFailureForIssueComment in reconcileStrandedAssignedIssues, not buildHeartbeatRunIssueComment in reapOrphanedRuns"}
 {"pattern":"duplicate_node_path","pr":270,"fix":"dropped_governance_files","date":"2026-04-15T22:00:00Z","reviewer":"bingran-you","detail":"Governance files already merged via #263; PR scoped to unique frontend nodes only"}
 {"pattern":"duplicate_node_path","pr":299,"fix":"dropped_duplicate_file","date":"2026-04-15T22:00:00Z","reviewer":"gardener-sync"}
+{"pattern":"subdomain_link_format_backtick","pr":303,"fix":"converted_to_markdown_link","date":"2026-04-16T03:05:00Z","reviewer":"serenakeyitan"}
+{"pattern":"parent_subdomain_missing","pr":305,"fix":"added_subdomains_section_to_parent","date":"2026-04-16T03:05:00Z","reviewer":"serenakeyitan"}
+{"pattern":"subdomain_link_format_backtick","pr":302,"fix":"converted_to_markdown_link","date":"2026-04-16T03:05:00Z","reviewer":"serenakeyitan"}
+{"pattern":"overstated_anti_enumeration_guarantee","pr":302,"fix":"narrowed_to_actual_invariant_403_vs_404","date":"2026-04-16T03:05:00Z","reviewer":"bingran-you"}

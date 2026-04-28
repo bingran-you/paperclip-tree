@@ -110,20 +110,32 @@ Classify each PR:
 Priority: `@gardener fix` PRs are processed first (explicit request from reviewer).
 
 **Close-language detection.** A reviewer review or comment is treated
-as a close-recommendation when the body matches any of these
-case-insensitive patterns:
+as a close-recommendation only when the body matches one of these
+**explicit, PR-level** close phrases (case-insensitive):
 
-- `please close` / `should be closed` / `recommend closing` / `close in favor of`
+- `please close (this|the) (pr|proposal)`
+- `recommend closing (this|the) (pr|proposal)` / `recommend closing in favor of`
+- `(this|the) pr should be closed` / `should close this pr`
+- `close (this|the) pr` / `closing (this|the) pr`
+- `duplicate (of )?#\d+` (numbered PR/issue reference, not a vague "duplicates the existing node")
 - `wrong source pr` / `wrong source mapping`
-- `duplicate of #` / `duplicate of` (followed by another PR reference)
 - `fundamental classification error`
-- `cannot be fixed in-place` (gardener's own previous comment doesn't count — exclude `$gardener_user`)
+- `cannot be fixed in-place` (excluding gardener's own previous comments)
 
-Any one of these phrases from a non-gardener reviewer is enough to
-route the PR to Step 1c instead of Step 2. Do NOT close on
-ambiguous language ("this seems wrong", "I'd close this") — only on
-the explicit phrases above. The bias is toward fixing rather than
-closing, since fix is recoverable and close is not.
+**`@<bot> fix` overrides close detection.** If the same review body
+or any later comment contains `@<bot> fix` (per the gardener-fix
+regex), route to Step 2 (fix), not Step 1c. The reviewer explicitly
+asked for a fix; close-language elsewhere in the review is
+clarifying context, not a close-recommendation.
+
+**Do NOT close on:**
+- "should be dropped" (could mean drop a single file from the PR — that's fix scope, not close).
+- "duplicate of <node-name>" without `#<n>` (that means the *content* duplicates an existing node — also fix scope, e.g. drop the redundant file).
+- "this seems wrong" / "not sure about this" / "I'd close this" — too ambiguous.
+- Any close-language inside backticks or block-quoted content (it may be quoting a previous bot comment).
+
+The bias is toward fixing rather than closing — fix is recoverable,
+close is not. When in doubt, route to Step 2.
 
 ### Step 1b: Merge APPROVED PRs
 
@@ -266,20 +278,27 @@ it is not gardener guessing.
 Detection (run once per PR):
 
 ```bash
-CLOSE_PHRASE=$(gh api "/repos/$TREE_REPO/issues/$NUMBER/comments" --paginate \
-  | jq -s -r --arg u "$gardener_user" '
-      [.[] | .[] | select(.user.login != $u) | .body] | join(" ")
-    ' \
-  | grep -oiE 'recommend closing|please close|should be closed|close in favor of|close (this|the) (pr|prop)|wrong source pr|wrong source mapping|duplicate of|fundamental classification error|cannot be fixed in-place' \
-  | head -1)
+# Combined non-gardener review + comment bodies.
+COMBINED=$(
+  {
+    gh api "/repos/$TREE_REPO/pulls/$NUMBER/reviews" \
+      | jq -r --arg u "$gardener_user" '[.[] | select(.user.login != $u) | .body] | join(" ")'
+    gh api "/repos/$TREE_REPO/issues/$NUMBER/comments" --paginate \
+      | jq -s -r --arg u "$gardener_user" '[.[] | .[] | select(.user.login != $u) | .body] | join(" ")'
+  } | tr '\n' ' '
+)
 
-# Also check the formal review bodies (not just issue comments).
-if [ -z "$CLOSE_PHRASE" ]; then
-  CLOSE_PHRASE=$(gh api "/repos/$TREE_REPO/pulls/$NUMBER/reviews" \
-    | jq -r --arg u "$gardener_user" '
-        [.[] | select(.user.login != $u) | .body] | join(" ")
-      ' \
-    | grep -oiE 'recommend closing|please close|should be closed|close in favor of|close (this|the) (pr|prop)|wrong source pr|wrong source mapping|duplicate of|fundamental classification error|cannot be fixed in-place' \
+# `@<bot> fix` always wins. If present anywhere in non-gardener content,
+# route to Step 2 instead.
+gardener_fix_re="@${gardener_user}[[:space:]]+fix"
+if echo "$COMBINED" | grep -qiE "$gardener_fix_re"; then
+  CLOSE_PHRASE=""
+else
+  # Strict, PR-level close phrases only. Vague language like
+  # "should be dropped" or unnumbered "duplicate of <node>" is excluded
+  # — those usually mean drop a file (fix scope), not close the PR.
+  CLOSE_PHRASE=$(echo "$COMBINED" | grep -oiE \
+    'please close (this|the) (pr|proposal)|recommend closing (this|the) (pr|proposal)|recommend closing in favor of|(this|the) pr should be closed|should close this pr|close (this|the) pr|closing (this|the) pr|duplicate of #[0-9]+|wrong source pr|wrong source mapping|fundamental classification error|cannot be fixed in-place' \
     | head -1)
 fi
 ```

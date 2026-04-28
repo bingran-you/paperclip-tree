@@ -1,3 +1,9 @@
+---
+title: "Hermes Local Adapter"
+owners: [bingran-you, cryppadotta, serenakeyitan]
+soft_links: ["adapters/NODE.md", "engineering/backend/NODE.md"]
+---
+
 # Hermes Local Adapter
 
 Adapter for **Hermes** (a local coding agent). Registered under adapter type key `hermes_local` and exposed in the UI as "Hermes Agent".

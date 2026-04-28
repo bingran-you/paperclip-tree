@@ -101,12 +101,29 @@ gh api repos/$TREE_REPO/issues/$NUMBER/comments \
 
 Classify each PR:
 - **APPROVED** → merge (Step 1b)
-- **CHANGES_REQUESTED** → queue for fix (Step 2)
+- **CHANGES_REQUESTED with explicit close language** → close (Step 1c)
+- **CHANGES_REQUESTED otherwise** → queue for fix (Step 2)
 - **Has `@gardener fix` comment** → queue for fix (Step 2), even if no formal review
 - **No review / REVIEW_REQUIRED** → skip
 - **Housekeeping** (title contains "housekeeping") → handle in Step 4
 
 Priority: `@gardener fix` PRs are processed first (explicit request from reviewer).
+
+**Close-language detection.** A reviewer review or comment is treated
+as a close-recommendation when the body matches any of these
+case-insensitive patterns:
+
+- `please close` / `should be closed` / `recommend closing` / `close in favor of`
+- `wrong source pr` / `wrong source mapping`
+- `duplicate of #` / `duplicate of` (followed by another PR reference)
+- `fundamental classification error`
+- `cannot be fixed in-place` (gardener's own previous comment doesn't count — exclude `$gardener_user`)
+
+Any one of these phrases from a non-gardener reviewer is enough to
+route the PR to Step 1c instead of Step 2. Do NOT close on
+ambiguous language ("this seems wrong", "I'd close this") — only on
+the explicit phrases above. The bias is toward fixing rather than
+closing, since fix is recoverable and close is not.
 
 ### Step 1b: Merge APPROVED PRs
 
@@ -237,6 +254,73 @@ Branch on `$POST_STATE`:
   merge) → log and skip:
 
   `log_event '"kind":"merge_aborted","pr_number":'$NUMBER',"reason":"closed_during_merge"'`
+
+### Step 1c: Close PRs the reviewer asked to close
+
+For each PR whose CHANGES_REQUESTED review or any non-gardener
+issue-comment matches the close-language patterns from Step 1's
+classification, **close the PR with a comment citing the reviewer
+phrase**. Closing here is honoring an explicit reviewer decision —
+it is not gardener guessing.
+
+Detection (run once per PR):
+
+```bash
+CLOSE_PHRASE=$(gh api "/repos/$TREE_REPO/issues/$NUMBER/comments" --paginate \
+  | jq -s -r --arg u "$gardener_user" '
+      [.[] | .[] | select(.user.login != $u) | .body] | join(" ")
+    ' \
+  | grep -oiE 'recommend closing|please close|should be closed|close in favor of|close (this|the) (pr|prop)|wrong source pr|wrong source mapping|duplicate of|fundamental classification error|cannot be fixed in-place' \
+  | head -1)
+
+# Also check the formal review bodies (not just issue comments).
+if [ -z "$CLOSE_PHRASE" ]; then
+  CLOSE_PHRASE=$(gh api "/repos/$TREE_REPO/pulls/$NUMBER/reviews" \
+    | jq -r --arg u "$gardener_user" '
+        [.[] | select(.user.login != $u) | .body] | join(" ")
+      ' \
+    | grep -oiE 'recommend closing|please close|should be closed|close in favor of|close (this|the) (pr|prop)|wrong source pr|wrong source mapping|duplicate of|fundamental classification error|cannot be fixed in-place' \
+    | head -1)
+fi
+```
+
+Pre-close sanity gate (skip the PR and log if any fails):
+
+1. PR is open (not already merged or closed).
+2. `$CLOSE_PHRASE` is non-empty.
+3. The closing reviewer is not `$gardener_user` (gardener cannot
+   close based on its own past comment).
+
+Close:
+
+```bash
+REVIEWER=$(gh api "/repos/$TREE_REPO/pulls/$NUMBER/reviews" \
+  --jq --arg u "$gardener_user" \
+  '[.[] | select(.user.login != $u and .state=="CHANGES_REQUESTED") | .user.login] | unique | first // empty')
+# Note: gh api --jq does not accept --arg. Pipe to standalone jq instead:
+REVIEWER=$(gh api "/repos/$TREE_REPO/pulls/$NUMBER/reviews" \
+  | jq -r --arg u "$gardener_user" \
+    '[.[] | select(.user.login != $u and .state=="CHANGES_REQUESTED") | .user.login] | unique | first // empty')
+
+gh pr comment $NUMBER --repo $TREE_REPO \
+  --body "🌱 Closing per reviewer request from @$REVIEWER (matched: \"$CLOSE_PHRASE\"). gardener-respond will not auto-close PRs without explicit close-language from a non-gardener reviewer."
+gh pr close $NUMBER --repo $TREE_REPO
+```
+
+Log:
+
+```
+✓ Closed #$NUMBER (per @$REVIEWER, phrase: $CLOSE_PHRASE)
+```
+
+`log_event '"kind":"close","pr_number":'$NUMBER',"reviewer":"'$REVIEWER'","phrase":"'$CLOSE_PHRASE'"'`
+
+**Important.** Close is **not** the right answer for "fixable" feedback
+(e.g. `parent_subdomain_missing`, `content_inaccuracy`, missing
+`soft_links`). Those route to Step 2. Close is reserved for reviewer
+phrases that say the PR itself is wrong at the structural level —
+the content can't be salvaged in-place, the next sync run will
+regenerate it correctly, or the PR is a duplicate.
 
 ## Step 2: Fix CHANGES_REQUESTED PRs
 
@@ -434,17 +518,11 @@ git push origin HEAD
 ```
 
 ### Unfixable PRs
-If feedback identifies a fundamental classification error (completely
-wrong source PR mapping), leave a comment explaining the issue.
-Do NOT close the PR — the reviewer agent decides whether to close.
-
-```bash
-gh pr comment $NUMBER --repo $TREE_REPO \
-  --body "⚠ This PR has a classification error — the NODE.md content doesn't match source PR #$SOURCE_PR.
-This cannot be fixed in-place. Recommend closing and letting the next sync run generate a correct PR.
-
-@reviewer please close if you agree."
-```
+**Superseded by Step 1c.** If feedback identifies a fundamental
+classification error and the reviewer used explicit close-language,
+Step 1c handles it. If the reviewer pointed at a real bug but did
+NOT use close-language, route to Step 2 (fix). Do not gardener-guess
+closes.
 
 ## Step 4: Housekeeping PR
 

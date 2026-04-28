@@ -1,3 +1,11 @@
+---
+title: "Test Command Tiers"
+owners: [bingran-you, cryppadotta, serenakeyitan]
+soft_links: ["infrastructure/testing/NODE.md", "infrastructure/ci-cd/NODE.md", "engineering/contributor-guide/NODE.md"]
+---
+
+# Test Command Tiers
+
 Paperclip's test commands are split into tiers so that the default local and agent test path stays cheap. Contributors and agents should run `pnpm test` by default; browser suites are opt-in and run only when the change touches them or when explicitly verifying CI/release flows.
 
 ## Key Decisions

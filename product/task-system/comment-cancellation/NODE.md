@@ -1,3 +1,9 @@
+---
+title: "Issue Comment Cancellation"
+owners: [bingran-you, cryppadotta, serenakeyitan]
+soft_links: ["product/task-system/NODE.md", "product/task-system/comment-wake/NODE.md", "engineering/backend/NODE.md"]
+---
+
 # Issue Comment Cancellation
 
 Individual issue comments can be fetched and cancelled (deleted) through dedicated endpoints: `GET /issues/:id/comments/:commentId` and `DELETE /issues/:id/comments/:commentId`. Cancellation removes the comment row and bumps the parent issue's `updatedAt`, returning the redacted deleted comment to the caller.

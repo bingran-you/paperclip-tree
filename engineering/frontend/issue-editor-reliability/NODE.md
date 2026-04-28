@@ -1,3 +1,11 @@
+---
+title: "Issue Editor Reliability"
+owners: [bingran-you, cryppadotta, serenakeyitan]
+soft_links: ["engineering/frontend/NODE.md", "engineering/frontend/issue-thread-ux/NODE.md"]
+---
+
+# Issue Editor Reliability
+
 Reliability conventions for the issue editor stack — the inline editor, markdown renderer/editor, quicklook, and the detail-page cache/query layer that feeds them.
 
 ## Key Decisions

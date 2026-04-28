@@ -1,3 +1,9 @@
+---
+title: "Hermes Adapter Auth Injection"
+owners: [bingran-you, cryppadotta, serenakeyitan]
+soft_links: ["engineering/backend/NODE.md", "adapters/hermes-local/NODE.md"]
+---
+
 # Hermes Adapter Auth Injection
 
 The Hermes local adapter (`hermes_local`) requires special handling in the server adapter registry to ensure agent identity attribution flows through to Paperclip API calls the Hermes runtime makes on behalf of the agent.

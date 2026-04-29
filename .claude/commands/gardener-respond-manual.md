@@ -181,9 +181,87 @@ Pre-merge sanity gate (skip the PR and log if any check fails):
      --jq '"\(.state) \(.mergeable)"')
    ```
 
-   Require `OPEN MERGEABLE`. If `CONFLICTING`, log and skip — the
-   PR needs a rebase first (handled by Step 2's normal fix path on
-   next run if reviewer requests changes).
+   Require `OPEN MERGEABLE`. If `UNKNOWN`, GitHub is still computing
+   — skip and let the next loop tick retry.
+
+   **If `CONFLICTING`, attempt auto-rebase before skipping.** The PR
+   was approved by a reviewer; conflicts are almost always main
+   moving forward (e.g. another sync PR landed and touched a parent
+   NODE.md). Sync regenerates branches but is rate-limit-bounded
+   (Anthropic 429 on classification kills the run), so respond
+   should not depend on it as the only refresh path.
+
+   ```bash
+   git fetch origin main 2>&1 | tail -1
+   git fetch origin "$BRANCH" 2>&1 | tail -1
+   git checkout "$BRANCH" 2>&1 | tail -1
+   # Reset to the latest remote tip so we don't carry stale local
+   # commits into the rebase resolution.
+   git reset --hard "origin/$BRANCH"
+
+   if git rebase origin/main; then
+     git push --force-with-lease origin HEAD 2>&1 | tail -2
+     # Re-check mergeability after the push. If still not MERGEABLE
+     # within ~30s, skip — GitHub is recomputing.
+     git checkout main
+     # Wait briefly, then refresh.
+     for i in 1 2 3 4 5 6; do
+       NEW_M=$(gh pr view $NUMBER --repo $TREE_REPO --json mergeable --jq .mergeable)
+       [ "$NEW_M" = "MERGEABLE" ] && break
+       sleep 5
+     done
+     if [ "$NEW_M" != "MERGEABLE" ]; then
+       log_event '"kind":"rebase_partial","pr_number":'$NUMBER',"reason":"mergeability_recompute_pending"'
+       continue
+     fi
+     log_event '"kind":"rebase","pr_number":'$NUMBER',"resolution":"clean"'
+     # Fall through to the normal merge below.
+   else
+     # Conflict resolution heuristic for tree NODE.md files:
+     # - For NODE.md and *.md: prefer "ours" (the PR's content) — it
+     #   captures the new decision, and main's edit is usually a
+     #   sibling-level Sub-domains entry from another PR that we'll
+     #   re-add manually if needed.
+     # - For .first-tree/learnings.jsonl: prefer "theirs" (main) —
+     #   learnings are append-only and main has the latest sequence.
+     # - For .github/CODEOWNERS: prefer "theirs" (main) — it's auto-
+     #   regenerated and main's tip reflects the current owner map.
+     # - For anything else: abort and skip the PR (out of scope for
+     #   automated resolution).
+     CAN_RESOLVE=true
+     for f in $(git diff --name-only --diff-filter=U); do
+       case "$f" in
+         *NODE.md|*.md)
+           git checkout --ours "$f" && git add "$f" ;;
+         .first-tree/learnings.jsonl|.github/CODEOWNERS)
+           git checkout --theirs "$f" && git add "$f" ;;
+         *)
+           CAN_RESOLVE=false ;;
+       esac
+     done
+     if [ "$CAN_RESOLVE" = "true" ]; then
+       git rebase --continue || CAN_RESOLVE=false
+     fi
+     if [ "$CAN_RESOLVE" = "true" ]; then
+       git push --force-with-lease origin HEAD 2>&1 | tail -2
+       git checkout main
+       log_event '"kind":"rebase","pr_number":'$NUMBER',"resolution":"heuristic"'
+       # Fall through to merge — but note: human may want to review
+       # since we made a content choice. Post a comment flagging it.
+       gh pr comment $NUMBER --repo $TREE_REPO --body "🌱 gardener-respond auto-resolved a rebase conflict before merging. Files preferred from PR side: NODE.md / .md. Files preferred from main: learnings.jsonl, CODEOWNERS. Review the merge commit if anything looks off."
+     else
+       git rebase --abort 2>/dev/null
+       git checkout main 2>/dev/null
+       log_event '"kind":"rebase_abort","pr_number":'$NUMBER',"reason":"unresolvable_conflict"'
+       echo "⏭ #$NUMBER CONFLICTING — auto-rebase failed (non-NODE.md files). Skipping; human must rebase or sync will refresh."
+       continue
+     fi
+   fi
+
+   # Re-evaluate $STATE after the rebase before falling through.
+   STATE=$(gh pr view $NUMBER --repo $TREE_REPO --json state,mergeable \
+     --jq '"\(.state) \(.mergeable)"')
+   ```
 
 4. Auto-merge is not already enabled. If a previous gardener-respond
    run hit the `OPEN`-after-merge branch (auto-merge queued), GitHub

@@ -66,3 +66,5 @@
 {"pattern":"parent_subdomain_missing","pr":574,"fix":"added_to_parent","date":"2026-04-28T23:34:24Z","reviewer":"bingran-you"}
 {"pattern":"duplicate_node_path","pr":541,"fix":"dropped_duplicate","date":"2026-04-28T23:34:24Z","reviewer":"bingran-you"}
 {"pattern":"reviewer_close_request","pr":571,"fix":"closed","date":"2026-04-28T23:34:24Z","reviewer":"bingran-you"}
+{"pattern":"parent_subdomain_missing","pr":543,"fix":"added_to_parent","date":"2026-04-29T00:12:35Z","reviewer":"bingran-you"}
+{"pattern":"duplicate_node_path","pr":543,"fix":"promoted_to_subdomain_dropped_decision_record","date":"2026-04-29T00:12:35Z","reviewer":"bingran-you"}
